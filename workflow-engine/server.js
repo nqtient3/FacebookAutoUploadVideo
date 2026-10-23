@@ -123,6 +123,18 @@ const server = http.createServer(async (req, res) => {
   const [reqPath] = req.url.split('?');
 
   // ==========================================
+  // API ROUTE: GET /health & /ping (Chống ngủ đông / Keep-Alive)
+  // ==========================================
+  if (req.method === 'GET' && (reqPath === '/health' || reqPath === '/ping' || reqPath === '/api/health')) {
+    return sendJsonResponse(res, 200, {
+      status: 'ok',
+      service: 'fb-auto-upload-video',
+      uptime: Math.floor(process.uptime()),
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  // ==========================================
   // API ROUTE 1: GET /api/config
   // ==========================================
   if (req.method === 'GET' && reqPath === '/api/config') {
@@ -500,9 +512,28 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(`=======================================================`);
-  console.log(`🚀 FB AutoPost Studio Local Server is running!`);
+  console.log(`🚀 FB AutoPost Studio Server is running!`);
   console.log(`🌐 Open in your browser: http://localhost:${PORT}`);
   console.log(`🔑 Page ID: ${currentConfig.FB_PAGE_ID || '(Chưa cấu hình)'}`);
   console.log(`🔐 Token Status: ${currentConfig.FB_PAGE_ACCESS_TOKEN ? 'Đã cài đặt' : '(Chưa cấu hình)'}`);
   console.log(`=======================================================`);
+
+  // Cơ chế Keep-Alive tự động chống ngủ đông trên Render Cloud
+  // Render tự gán biến môi trường RENDER_EXTERNAL_URL (VD: https://facebookautouploadvideo.onrender.com)
+  const externalUrl = process.env.RENDER_EXTERNAL_URL || process.env.APP_URL;
+  if (externalUrl) {
+    const pingEndpoint = externalUrl.replace(/\/$/, '') + '/ping';
+    console.log(`[Keep-Alive] 🔄 Đã kích hoạt cơ chế chống ngủ đông cho Render Cloud: ${pingEndpoint}`);
+    
+    // Gửi request mỗi 10 phút (Render đưa vào chế độ ngủ sau 15 phút không hoạt động)
+    setInterval(async () => {
+      try {
+        const res = await fetch(pingEndpoint);
+        console.log(`[Keep-Alive] 💓 Ping sống lúc ${new Date().toLocaleTimeString('vi-VN')} -> Status: ${res.status}`);
+      } catch (err) {
+        console.warn(`[Keep-Alive] ⚠️ Ping thất bại: ${err.message}`);
+      }
+    }, 10 * 60 * 1000);
+  }
 });
+
