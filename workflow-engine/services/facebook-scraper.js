@@ -335,13 +335,25 @@ function downloadReel({ reelUrl, outputDir = path.join(__dirname, '..', 'downloa
       });
     }
 
-    // Tìm yt-dlp phù hợp trên Windows hoặc Linux
+    // Tìm yt-dlp phù hợp theo hệ điều hành (Windows vs Linux/Docker)
     let ytdlpPath = 'yt-dlp';
-    const localWindowsBin = path.join(__dirname, '..', 'bin', 'yt-dlp.exe');
-    if (process.platform === 'win32' && fs.existsSync(localWindowsBin)) {
-      ytdlpPath = localWindowsBin;
-    } else if (fs.existsSync(localWindowsBin)) {
-      ytdlpPath = localWindowsBin;
+    if (process.platform === 'win32') {
+      const localWindowsBin = path.join(__dirname, '..', 'bin', 'yt-dlp.exe');
+      if (fs.existsSync(localWindowsBin)) {
+        ytdlpPath = localWindowsBin;
+      }
+    } else {
+      // Môi trường Linux / Docker / Render Cloud (Tuyệt đối không chạy file .exe trên Linux)
+      const linuxCandidates = [
+        '/usr/local/bin/yt-dlp',
+        '/usr/bin/yt-dlp'
+      ];
+      for (const p of linuxCandidates) {
+        if (fs.existsSync(p)) {
+          ytdlpPath = p;
+          break;
+        }
+      }
     }
 
     const outputTemplate = path.join(outputDir, `${reelId}.%(ext)s`);

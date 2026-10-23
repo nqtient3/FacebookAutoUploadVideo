@@ -5,3 +5,6 @@ downloads/*.mp4
 .env
 workflow-engine/.env
 .git
+*.exe
+workflow-engine/bin/*.exe
+bin/*.exe
