@@ -1,0 +1,1376 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FB AutoPost Studio - Tự Động Hóa Đăng Bài Fanpage Facebook</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="navbar">
+    <div class="nav-left">
+      <div class="brand-badge">
+        <div class="brand-logo-icon">
+          <!-- Facebook Auto Engine Icon -->
+          <svg viewBox="0 0 24 24">
+            <path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/>
+          </svg>
+        </div>
+        <div>
+          <div class="brand-title">FB AutoPost Studio</div>
+          <div class="brand-subtitle">
+            <span>Workflow Engine Scheduler</span>
+            <span style="color: #3b82f6">•</span>
+            <span style="color: #10b981">v2.5 Pro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs">
+        <button class="nav-tab-btn" data-tab="composer-view">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          Đăng bài & Hẹn giờ
+        </button>
+        <button class="nav-tab-btn active" data-tab="reels-view" style="color: #fde047; font-weight: 700;">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/><rect x="2" y="2" width="20" height="20" rx="4"/></svg>
+          🎬 Auto Reels (Thỏ Bảy Màu)
+          <span style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size: 0.65rem; padding: 0.15rem 0.45rem; border-radius: 8px; margin-left: 0.35rem; font-weight: 800;">TOP VIEW</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="calendar-view">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          Lịch đăng bài
+        </button>
+        <button class="nav-tab-btn" data-tab="queue-view">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Hàng đợi tự động
+          <span id="queue-count-badge" style="background:#1e40af;color:#93c5fd;font-size:0.7rem;padding:0.1rem 0.4rem;border-radius:10px;">3</span>
+        </button>
+        <button class="nav-tab-btn" data-tab="engine-view">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+          Workflow Engine API
+        </button>
+      </nav>
+    </div>
+
+    <!-- Right: Page Badge & Clock -->
+    <div class="nav-right">
+      <div class="time-clock-chip">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span>GMT+7:</span>
+        <strong id="live-clock">14:00:00</strong>
+      </div>
+
+      <div class="fanpage-badge" id="btn-page-switch" title="Nhấp để xem hoặc cài đặt Fanpage">
+        <img src="assets/page-avatar.jpg" alt="Fanpage Avatar" class="page-avatar-thumb" id="nav-page-avatar">
+        <div class="page-meta">
+          <div class="page-name-row">
+            <span id="nav-page-name">Chưa kết nối Fanpage</span>
+            <svg class="verified-icon" id="nav-verified-icon" viewBox="0 0 24 24" style="display:none;"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+          </div>
+          <div class="page-status-row">
+            <span class="status-dot" id="nav-status-dot" style="background:#9ca3af;"></span>
+            <span id="nav-status-text">Chờ cấu hình Page ID & Token</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="app-container">
+
+    <!-- ============================================== -->
+    <!-- VIEW 1: COMPOSER & SCHEDULER STUDIO -->
+    <!-- ============================================== -->
+    <section id="composer-view" class="view-section">
+      <div class="composer-grid">
+        
+        <!-- COLUMN 1: CONTENT CREATOR -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+              </div>
+              <div>
+                <h2 class="card-title">1. Nội dung & Video</h2>
+                <div class="card-desc">Thiết lập đa phương tiện và thông điệp bài viết</div>
+              </div>
+            </div>
+            <span class="badge-tag" style="color: #60a5fa; border-color: rgba(59,130,246,0.3)">Fanpage ID: 109283746</span>
+          </div>
+
+          <!-- Format Selector -->
+          <div class="form-group">
+            <label class="form-label">
+              <span>Định dạng đăng Facebook</span>
+              <span class="form-label-right" id="format-hint">Tối ưu Reels di động 9:16</span>
+            </label>
+            <div class="format-selector">
+              <button type="button" class="format-btn active" data-format="reels">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="7" y="2" width="10" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+                <span>Reels (9:16)</span>
+              </button>
+              <button type="button" class="format-btn" data-format="feed-video">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
+                <span>Video Feed (16:9)</span>
+              </button>
+              <button type="button" class="format-btn" data-format="photos">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                <span>Hình ảnh</span>
+              </button>
+              <button type="button" class="format-btn" data-format="status">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                <span>Trạng thái</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Video / Media Upload Area -->
+          <div class="dropzone-container" id="dropzone">
+            <input type="file" id="media-file-input" accept="video/mp4,video/quicktime,image/*" style="display:none;">
+            <div class="dropzone-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            </div>
+            <div class="dropzone-title">Kéo & Thả Video/Ảnh hoặc Nhấp để chọn tệp</div>
+            <div class="dropzone-sub">Hỗ trợ MP4, MOV, WebM, JPG, PNG (Tối đa 2GB)</div>
+            <div class="dropzone-tags">
+              <span class="badge-tag">Tự động nén HD</span>
+              <span class="badge-tag">AI tạo thumbnail</span>
+              <span class="badge-tag">Kiểm tra bản quyền âm thanh</span>
+            </div>
+          </div>
+
+          <!-- Media Active Preview Inside Card -->
+          <div class="media-preview-box active" id="card-media-preview">
+            <img src="assets/sample-reels.jpg" alt="Selected Media" class="media-preview-img" id="card-preview-img">
+            <div class="media-preview-overlay">
+              <div class="media-badges">
+                <span class="media-pill" id="media-type-badge">
+                  <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                  Reel • 00:45s
+                </span>
+                <button type="button" class="btn-remove-media" id="btn-remove-media" title="Đổi tệp khác">✕</button>
+              </div>
+              <div class="media-badges">
+                <span class="media-pill" style="background: rgba(16,185,129,0.85); color:#fff;">✓ Chuẩn tỷ lệ 9:16 (1080x1920)</span>
+                <span class="media-pill" id="media-size-badge">24.5 MB</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Caption & Copywriting -->
+          <div class="form-group">
+            <label class="form-label" for="caption-input">
+              <span>Nội dung bài viết (Caption)</span>
+              <span class="form-label-right" id="caption-counter">148 ký tự</span>
+            </label>
+            <div class="textarea-wrapper">
+              <textarea id="caption-input" class="custom-textarea" rows="4" placeholder="Viết caption hấp dẫn, kêu gọi tương tác, thêm emoji và thẻ hashtag...">🔥 Trải nghiệm siêu phẩm công nghệ thế hệ mới! Với bộ vi xử lý lượng tử và màn hình tương lai, bạn nghĩ sản phẩm này có đáng giá? 
+Bình luận ý kiến của bạn bên dưới nhé! 👇</textarea>
+            </div>
+
+            <!-- Composer Toolbar -->
+            <div class="composer-toolbar">
+              <div class="toolbar-buttons">
+                <button type="button" class="tool-chip ai-chip" id="btn-ai-hook">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                  AI Viết lại giật tít
+                </button>
+                <button type="button" class="tool-chip" id="btn-add-emoji">
+                  😊 Emoji
+                </button>
+                <button type="button" class="tool-chip" id="btn-add-cta">
+                  🔗 Kêu gọi hành động (CTA)
+                </button>
+              </div>
+            </div>
+
+            <!-- Hashtag Suggestions -->
+            <div class="hashtag-chips" id="hashtag-container">
+              <span class="htag">#congnghe</span>
+              <span class="htag">#facebookreels</span>
+              <span class="htag">#xuhuong2026</span>
+              <span class="htag">#review</span>
+              <span class="htag">#viralvideo</span>
+              <span class="htag">+ Thêm tag</span>
+            </div>
+          </div>
+
+          <!-- First Comment & Automation Addon -->
+          <div class="extra-options-box">
+            <div class="toggle-row" id="toggle-first-comment-wrap">
+              <div class="toggle-info">
+                <div class="toggle-title">💬 Tự động bình luận đầu tiên (First Comment)</div>
+                <div class="toggle-sub">Ghim liên kết mua hàng hoặc kêu gọi chia sẻ ngay khi đăng</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="check-first-comment" checked>
+                <span class="slider"></span>
+              </label>
+            </div>
+
+            <div class="drawer-content open" id="drawer-first-comment">
+              <textarea id="first-comment-input" class="custom-textarea" style="min-height: 65px;" placeholder="Nhập nội dung bình luận tự động...">👉 Xem chi tiết thông số kỹ thuật và ưu đãi độc quyền tại link này nhé cả nhà: https://techreels.vn/review-sieu-pham</textarea>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- COLUMN 2: FULL SCHEDULING & TIMING ENGINE -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <h2 class="card-title">2. Cài Đặt Thời Gian & Tự Động</h2>
+                <div class="card-desc">Thiết lập hẹn giờ chính xác, khung giờ vàng & chống spam</div>
+              </div>
+            </div>
+            <span class="badge-tag" style="color: #34d399; border-color: rgba(16,185,129,0.3)">Múi giờ GMT+7</span>
+          </div>
+
+          <!-- Schedule Mode Navigation Tabs -->
+          <div class="schedule-mode-tabs">
+            <button type="button" class="mode-tab-btn active" data-mode="one-time">
+              🕒 Hẹn giờ 1 lần
+            </button>
+            <button type="button" class="mode-tab-btn" data-mode="recurring">
+              🔁 Lịch định kỳ lặp lại
+            </button>
+            <button type="button" class="mode-tab-btn" data-mode="smart-queue">
+              ⚡ Hàng đợi thông minh
+            </button>
+          </div>
+
+          <!-- MODE 1: ONE-TIME SCHEDULE -->
+          <div id="panel-one-time" class="mode-panel active">
+            
+            <div class="datetime-grid">
+              <div>
+                <label class="form-label" for="schedule-date">Ngày đăng</label>
+                <input type="date" id="schedule-date" class="input-field">
+              </div>
+              <div>
+                <label class="form-label" for="schedule-time">Giờ đăng (24h)</label>
+                <input type="time" id="schedule-time" class="input-field" value="19:30">
+              </div>
+            </div>
+
+            <!-- Golden Peak Hours Recommendation -->
+            <div class="golden-hours-section">
+              <div class="golden-header">
+                <div class="golden-title">
+                  <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                  <span>Khung Giờ Vàng Đề Xuất (Fanpage AI Insights)</span>
+                </div>
+                <span class="golden-sub">Nhấp để áp dụng ngay</span>
+              </div>
+
+              <div class="peak-slots-grid">
+                <div class="peak-slot-card" data-time="07:45">
+                  <div>
+                    <div class="slot-time">07:45 Sáng</div>
+                    <div class="slot-label">Bắt đầu ngày mới</div>
+                  </div>
+                  <div class="slot-score">88% Reach</div>
+                </div>
+
+                <div class="peak-slot-card" data-time="11:45">
+                  <div>
+                    <div class="slot-time">11:45 Trưa</div>
+                    <div class="slot-label">Giờ nghỉ trưa</div>
+                  </div>
+                  <div class="slot-score">94% Reach</div>
+                </div>
+
+                <div class="peak-slot-card selected" data-time="19:30">
+                  <div>
+                    <div class="slot-time">19:30 Tối ⭐</div>
+                    <div class="slot-label">Thời gian vàng cao nhất</div>
+                  </div>
+                  <div class="slot-score" style="background:rgba(245,158,11,0.2);color:#fbbf24;">98% Reach</div>
+                </div>
+
+                <div class="peak-slot-card" data-time="22:15">
+                  <div>
+                    <div class="slot-time">22:15 Đêm</div>
+                    <div class="slot-label">Xem thư giãn trước ngủ</div>
+                  </div>
+                  <div class="slot-score">85% Reach</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- MODE 2: RECURRING SCHEDULE -->
+          <div id="panel-recurring" class="mode-panel">
+            <div class="form-group">
+              <label class="form-label">Chọn các ngày trong tuần lặp lại</label>
+              <div class="days-selector">
+                <button type="button" class="day-btn active" data-day="1">T2</button>
+                <button type="button" class="day-btn active" data-day="2">T3</button>
+                <button type="button" class="day-btn active" data-day="3">T4</button>
+                <button type="button" class="day-btn active" data-day="4">T5</button>
+                <button type="button" class="day-btn active" data-day="5">T6</button>
+                <button type="button" class="day-btn active" data-day="6">T7</button>
+                <button type="button" class="day-btn active" data-day="0">CN</button>
+              </div>
+            </div>
+
+            <div class="datetime-grid">
+              <div>
+                <label class="form-label">Giờ cố định mỗi ngày</label>
+                <input type="time" id="recurring-fixed-time" class="input-field" value="20:00">
+              </div>
+              <div>
+                <label class="form-label">Số bài đăng / ngày</label>
+                <select id="recurring-count-per-day" class="input-field">
+                  <option value="1">1 bài / ngày</option>
+                  <option value="2">2 bài / ngày (Cách 6h)</option>
+                  <option value="3" selected>3 bài / ngày (Sáng, Trưa, Tối)</option>
+                  <option value="4">4 bài / ngày</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="datetime-grid">
+              <div>
+                <label class="form-label">Từ ngày</label>
+                <input type="date" id="recurring-start-date" class="input-field">
+              </div>
+              <div>
+                <label class="form-label">Đến ngày (Kết thúc)</label>
+                <input type="date" id="recurring-end-date" class="input-field">
+              </div>
+            </div>
+          </div>
+
+          <!-- MODE 3: SMART QUEUE (DRIP FEED) -->
+          <div id="panel-smart-queue" class="mode-panel">
+            <div class="form-group">
+              <label class="form-label">Chiến lược phân phối Drip-Feed</label>
+              <select id="queue-slot-strategy" class="input-field">
+                <option value="next_available" selected>Tự động điền vào khung giờ trống kế tiếp</option>
+                <option value="fixed_gap_2h">Cách bài trước tối thiểu 2 tiếng</option>
+                <option value="fixed_gap_4h">Cách bài trước tối thiểu 4 tiếng</option>
+                <option value="daily_prime">Chỉ đăng vào khung giờ vàng buổi tối (19h30 - 21h)</option>
+              </select>
+            </div>
+            
+            <div class="summary-box" style="border-color: rgba(59,130,246,0.3); background: rgba(59,130,246,0.06);">
+              <div class="summary-row">
+                <span class="summary-label">Khung giờ tiếp theo khả dụng:</span>
+                <span class="summary-val" style="color:#60a5fa;" id="next-queue-slot-text">Hôm nay, 21:00 (Slot #4)</span>
+              </div>
+              <div class="summary-row">
+                <span class="summary-label">Số bài đang chờ trong hàng:</span>
+                <span class="summary-val">3 bài viết</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ANTI-SPAM JITTER DELAY (Crucial Facebook Feature) -->
+          <div class="safety-box">
+            <div class="safety-header">
+              <div class="safety-title">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                <span>Chế độ Ngẫu Nhiên Hóa Chống Quét Bot Facebook</span>
+              </div>
+              <span id="jitter-display" style="font-size:0.75rem;font-weight:700;color:#34d399;">± 8 Phút</span>
+            </div>
+            <div class="safety-sub">
+              Facebook dễ đánh dấu trang spam nếu lịch đăng đều tăm tắp đúng từng giây. Tính năng này sẽ xê dịch thời gian ngẫu nhiên để bài đăng tự nhiên như người thao tác.
+            </div>
+            <div class="slider-container">
+              <input type="range" id="anti-spam-jitter" class="range-slider" min="0" max="25" value="8" step="1">
+              <div class="slider-labels">
+                <span>0 phút (Chính xác)</span>
+                <span>± 10 phút (Khuyên dùng)</span>
+                <span>± 25 phút</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Post-Publish Automations -->
+          <div class="extra-options-box" style="margin-bottom: 1.25rem;">
+            <div class="toggle-row">
+              <div class="toggle-info">
+                <div class="toggle-title">📌 Tự động ghim bài viết lên đầu trang (Pin to top)</div>
+                <div class="toggle-sub">Ghim liên tục trong 48 giờ sau khi đăng thành công</div>
+              </div>
+              <label class="switch">
+                <input type="checkbox" id="check-pin-post">
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Summary & Action Button -->
+          <div class="summary-box">
+            <div class="summary-row">
+              <span class="summary-label">Thời điểm đăng thực tế dự kiến:</span>
+              <span class="summary-val" id="summary-real-time">21/10/2026 lúc 19:38 (± 8p)</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Fanpage đích:</span>
+              <span class="summary-val" style="color:#60a5fa;">TechReels Media (Official)</span>
+            </div>
+            <div class="summary-row">
+              <span class="summary-label">Trạng thái tự động hóa:</span>
+              <span class="summary-val" style="color:#34d399;">Sẵn sàng đẩy vào Workflow</span>
+            </div>
+          </div>
+
+          <!-- Big Action Buttons -->
+          <div style="display: flex; gap: 0.75rem;">
+            <button type="button" class="btn-primary-action" id="btn-submit-schedule">
+              <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>LÊN LỊCH TỰ ĐỘNG ĐĂNG BÀI</span>
+            </button>
+            <button type="button" class="btn-queue-action publish-now" id="btn-publish-now" title="Bỏ qua lịch và đăng lên Fanpage ngay bây giờ" style="padding: 0 1.25rem;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              Đăng ngay
+            </button>
+          </div>
+
+        </div>
+
+        <!-- COLUMN 3: REALISTIC FACEBOOK PREVIEW -->
+        <div class="preview-column">
+          <div class="preview-controls">
+            <span style="font-size:0.825rem; font-weight:700; color:var(--text-muted); display:flex; align-items:center; gap:0.4rem;">
+              <svg width="16" height="16" fill="currentColor" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+              Xem trước bài đăng (Live Mockup)
+            </span>
+            <div class="preview-mode-switch">
+              <button type="button" class="preview-tab active" data-preview-mode="feed">Bản tin</button>
+              <button type="button" class="preview-tab" data-preview-mode="reels">Reels (9:16)</button>
+            </div>
+          </div>
+
+          <!-- 1. FEED MOCKUP VIEW -->
+          <div id="fb-feed-preview" class="fb-mock-card">
+            <div class="fb-post-header">
+              <div class="fb-post-author">
+                <img src="assets/page-avatar.jpg" alt="Author Avatar" class="fb-author-img">
+                <div class="fb-author-meta">
+                  <div class="fb-author-name">
+                    <span>TechReels Media</span>
+                    <svg class="verified-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                  </div>
+                  <div class="fb-post-time">
+                    <span id="preview-publish-time">Đã lên lịch • 19:38</span>
+                    <span>•</span>
+                    <!-- Facebook Public Globe Icon -->
+                    <svg width="12" height="12" fill="currentColor" viewBox="0 0 16 16"><path d="M8 0a8 8 0 1 0 0 16A8 8 0 0 0 8 0zm6.5 7.5h-2.12a13.3 13.3 0 0 0-.82-4.04A6.52 6.52 0 0 1 14.5 7.5zM8 1.5c.87 0 1.93 1.7 2.3 5H5.7c.37-3.3 1.43-5 2.3-5zm-4.38 2A13.3 13.3 0 0 0 2.8 7.5H.68a6.52 6.52 0 0 1 2.94-4zM.68 8.5h2.12c.16 1.45.45 2.84.82 4.04A6.52 6.52 0 0 1 .68 8.5zm5.02 0h4.6c-.37 3.3-1.43 5-2.3 5s-1.93-1.7-2.3-5zm5.88 4.04c.37-1.2.66-2.59.82-4.04h2.12a6.52 6.52 0 0 1-2.94 4.04z"/></svg>
+                  </div>
+                </div>
+              </div>
+              <div class="fb-header-action">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg>
+              </div>
+            </div>
+
+            <!-- Post Caption in Preview -->
+            <div class="fb-post-caption" id="preview-caption-text">
+🔥 Trải nghiệm siêu phẩm công nghệ thế hệ mới! Với bộ vi xử lý lượng tử và màn hình tương lai, bạn nghĩ sản phẩm này có đáng giá? 
+Bình luận ý kiến của bạn bên dưới nhé! 👇
+<span style="color:#4599ff">#congnghe #facebookreels #xuhuong2026</span>
+            </div>
+
+            <!-- Post Media (Video/Photo Preview) -->
+            <div class="fb-post-media" id="preview-media-wrapper">
+              <img src="assets/sample-feed.jpg" alt="Feed Media Preview" class="fb-media-element" id="preview-media-img">
+              <div class="fb-video-overlay" id="preview-video-play-btn">
+                <div class="fb-play-btn">
+                  <svg width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+                </div>
+              </div>
+              <div class="fb-video-badges">
+                <span class="fb-badge-pill" id="preview-duration-badge">00:45</span>
+                <span class="fb-badge-pill">HD 1080p</span>
+              </div>
+            </div>
+
+            <!-- Reaction Counts Bar -->
+            <div class="fb-post-stats">
+              <div class="fb-reactions-count">
+                <div class="reaction-icons-stack">
+                  <span class="reaction-bubble like">👍</span>
+                  <span class="reaction-bubble heart">❤️</span>
+                  <span class="reaction-bubble haha">😆</span>
+                </div>
+                <span style="margin-left: 6px;" id="preview-likes-count">1.4K</span>
+              </div>
+              <div>
+                <span>328 bình luận</span> • <span>156 chia sẻ</span>
+              </div>
+            </div>
+
+            <!-- Action Buttons: Like, Comment, Share -->
+            <div class="fb-post-actions">
+              <button type="button" class="fb-action-btn">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                <span>Thích</span>
+              </button>
+              <button type="button" class="fb-action-btn">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                <span>Bình luận</span>
+              </button>
+              <button type="button" class="fb-action-btn">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                <span>Chia sẻ</span>
+              </button>
+            </div>
+
+            <!-- First Comment Preview Section -->
+            <div class="fb-comment-section" id="preview-first-comment-wrap">
+              <div class="fb-comment-item">
+                <img src="assets/page-avatar.jpg" alt="Commenter Avatar" class="fb-author-img" style="width: 32px; height: 32px;">
+                <div class="fb-comment-bubble">
+                  <div class="fb-comment-author">
+                    <span>TechReels Media</span>
+                    <span class="fb-badge-author">Tác giả</span>
+                  </div>
+                  <div class="fb-comment-text" id="preview-first-comment-text">
+                    👉 Xem chi tiết thông số kỹ thuật và ưu đãi độc quyền tại link này nhé cả nhà: https://techreels.vn/review-sieu-pham
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 2. REELS MOCKUP VIEW (9:16) -->
+          <div id="fb-reels-preview" class="fb-reels-mock">
+            <img src="assets/sample-reels.jpg" alt="Reels Preview" class="fb-reels-bg" id="preview-reels-img">
+            <div class="fb-reels-overlay">
+              <div class="fb-reels-top">
+                <div style="display:flex;align-items:center;gap:0.4rem;">
+                  <span style="background:rgba(255,255,255,0.25);padding:0.2rem 0.6rem;border-radius:12px;font-size:0.75rem;">Reels</span>
+                </div>
+                <div>
+                  <svg width="22" height="22" fill="#fff" viewBox="0 0 24 24"><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/><circle cx="5" cy="12" r="2"/></svg>
+                </div>
+              </div>
+
+              <div class="fb-reels-body">
+                <div class="fb-reels-info">
+                  <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.5rem;">
+                    <img src="assets/page-avatar.jpg" style="width:32px;height:32px;border-radius:50%;" alt="Avatar">
+                    <span style="font-weight:700;font-size:0.85rem;">TechReels Media</span>
+                    <button style="background:transparent;border:1px solid #fff;color:#fff;border-radius:4px;font-size:0.7rem;padding:0.15rem 0.5rem;">Theo dõi</button>
+                  </div>
+                  <div style="font-size:0.8rem;line-height:1.4;margin-bottom:0.4rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;" id="reels-preview-caption">
+                    🔥 Trải nghiệm siêu phẩm công nghệ thế hệ mới! Bộ vi xử lý lượng tử và màn hình tương lai...
+                  </div>
+                  <div style="font-size:0.7rem;color:#cbd5e1;display:flex;align-items:center;gap:0.3rem;">
+                    <span>🎵 Âm thanh gốc - TechReels Studio (Thịnh hành)</span>
+                  </div>
+                </div>
+
+                <div class="fb-reels-actions">
+                  <div class="reels-action-item">
+                    <div class="reels-btn-circle">❤️</div>
+                    <span>42.8K</span>
+                  </div>
+                  <div class="reels-action-item">
+                    <div class="reels-btn-circle">💬</div>
+                    <span>1.2K</span>
+                  </div>
+                  <div class="reels-action-item">
+                    <div class="reels-btn-circle">↗️</div>
+                    <span>892</span>
+                  </div>
+                  <div class="reels-action-item">
+                    <div class="reels-btn-circle" style="border: 2px solid #fff;">
+                      <img src="assets/page-avatar.jpg" style="width:26px;height:26px;border-radius:50%;" alt="Sound Cover">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- VIEW 2: INTERACTIVE CALENDAR & SCHEDULE MATRIX -->
+    <!-- ============================================== -->
+    <section id="calendar-view" class="view-section">
+      <div class="glass-card">
+        <div class="calendar-header-bar">
+          <div class="cal-nav-group">
+            <button type="button" class="btn-icon-cal" id="btn-cal-prev">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <h2 class="cal-month-title" id="cal-month-name">Tháng 10, 2026</h2>
+            <button type="button" class="btn-icon-cal" id="btn-cal-next">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
+            <button type="button" class="btn-queue-action" id="btn-cal-today">Hôm nay</button>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:0.75rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem; font-size:0.75rem; color:var(--text-muted);">
+              <span style="display:inline-block;width:10px;height:10px;background:#3b82f6;border-radius:2px;"></span> Đã lên lịch
+              <span style="display:inline-block;width:10px;height:10px;background:#10b981;border-radius:2px;margin-left:0.5rem;"></span> Đã đăng thành công
+              <span style="display:inline-block;width:10px;height:10px;background:#f59e0b;border-radius:2px;margin-left:0.5rem;"></span> Hàng đợi Drip-Feed
+            </div>
+            <button type="button" class="btn-primary-action" id="btn-quick-new-schedule" style="width:auto; padding:0.5rem 1rem; font-size:0.825rem;">
+              + Thêm lịch đăng
+            </button>
+          </div>
+        </div>
+
+        <!-- 7-Day Header -->
+        <div class="calendar-grid" style="margin-bottom: 0.5rem;">
+          <div class="cal-day-header">Thứ Hai</div>
+          <div class="cal-day-header">Thứ Ba</div>
+          <div class="cal-day-header">Thứ Tư</div>
+          <div class="cal-day-header">Thứ Năm</div>
+          <div class="cal-day-header">Thứ Sáu</div>
+          <div class="cal-day-header">Thứ Bảy</div>
+          <div class="cal-day-header" style="color:#f87171;">Chủ Nhật</div>
+        </div>
+
+        <!-- Calendar Days Grid Rendered dynamically by JavaScript -->
+        <div class="calendar-grid" id="calendar-cells-grid"></div>
+      </div>
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- VIEW 3: SMART QUEUE & DRIP-FEED MANAGER -->
+    <!-- ============================================== -->
+    <section id="queue-view" class="view-section">
+      <div class="queue-dashboard-grid">
+        
+        <!-- Left: Queue Posts Stream -->
+        <div>
+          <div class="glass-card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                </div>
+                <div>
+                  <h2 class="card-title">Danh Sách Bài Viết Đang Chờ Đăng Tự Động</h2>
+                  <div class="card-desc">Tự động kích hoạt khi đến giờ hẹn thông qua Workflow Engine</div>
+                </div>
+              </div>
+              <div style="display:flex; gap:0.5rem;">
+                <button type="button" class="btn-queue-action" id="btn-pause-all-queue">⏸️ Tạm dừng toàn bộ</button>
+                <button type="button" class="btn-queue-action" id="btn-resume-all-queue">▶️ Tiếp tục chạy</button>
+              </div>
+            </div>
+
+            <div id="queue-items-container">
+              <!-- Dynamically populated queue items -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Slot Configurations & Safety Limits -->
+        <div>
+          <div class="glass-card" style="margin-bottom: 1.5rem;">
+            <div class="card-header">
+              <div class="card-title-group">
+                <div class="card-icon">
+                  <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+                </div>
+                <h3 class="card-title">Cấu hình Khung Giờ (Slots)</h3>
+              </div>
+            </div>
+
+            <div style="font-size:0.8rem; color:var(--text-muted); margin-bottom:1rem;">
+              Các bài đăng mới khi được xếp vào hàng đợi Drip-Feed sẽ tự động được gán vào khung giờ trống tiếp theo:
+            </div>
+
+            <div style="display:flex; flex-direction:column; gap:0.5rem; margin-bottom:1.25rem;">
+              <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:0.6rem 0.85rem; border-radius:8px;">
+                <span style="font-size:0.85rem; font-weight:700; color:#fff;">Slot #1: 08:30 Sáng</span>
+                <span class="badge-tag" style="color:#10b981;">Đang hoạt động</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:0.6rem 0.85rem; border-radius:8px;">
+                <span style="font-size:0.85rem; font-weight:700; color:#fff;">Slot #2: 12:15 Trưa</span>
+                <span class="badge-tag" style="color:#10b981;">Đang hoạt động</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:0.6rem 0.85rem; border-radius:8px;">
+                <span style="font-size:0.85rem; font-weight:700; color:#fff;">Slot #3: 17:45 Chiều</span>
+                <span class="badge-tag" style="color:#10b981;">Đang hoạt động</span>
+              </div>
+              <div style="display:flex; justify-content:space-between; align-items:center; background:var(--bg-input); padding:0.6rem 0.85rem; border-radius:8px;">
+                <span style="font-size:0.85rem; font-weight:700; color:#fff;">Slot #4: 20:30 Tối ⭐</span>
+                <span class="badge-tag" style="color:#fbbf24;">Ưu tiên cao</span>
+              </div>
+            </div>
+
+            <!-- Rate Limit info -->
+            <div class="safety-box">
+              <div style="font-size:0.8rem; font-weight:700; color:#34d399; margin-bottom:0.35rem;">
+                🛡️ Giới hạn an toàn Fanpage (Rate Limits)
+              </div>
+              <div style="font-size:0.75rem; color:var(--text-muted); line-height:1.5;">
+                • Giãn cách tối thiểu giữa 2 bài: <strong>60 phút</strong><br>
+                • Giới hạn bài đăng tối đa: <strong>8 bài / 24 giờ</strong><br>
+                • Tránh checkpoint hoặc hạn chế tính năng Page.
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- VIEW 4: WORKFLOW ENGINE INTEGRATION & RUNNER -->
+    <!-- ============================================== -->
+    <section id="engine-view" class="view-section">
+      <div class="queue-dashboard-grid">
+        
+        <!-- Left: Configuration & JSON Payload -->
+        <div class="glass-card">
+          <div class="card-header">
+            <div class="card-title-group">
+              <div class="card-icon" style="background: rgba(139, 92, 246, 0.15); color: #c4b5fd;">
+                <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+              </div>
+              <div>
+                <h2 class="card-title">Kết Nối Backend: Workflow Engine</h2>
+                <div class="card-desc">Cấu hình Graph API và tạo Schema Payload cho TypeScript Engine</div>
+              </div>
+            </div>
+            <button type="button" class="btn-queue-action" id="btn-copy-json">📋 Sao chép JSON</button>
+          </div>
+
+          <!-- Connection Status Card -->
+          <div id="fanpage-connection-status" style="background: rgba(30, 41, 59, 0.7); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.85rem; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+              <div id="status-icon-box" style="width: 38px; height: 38px; border-radius: 50%; background: rgba(148, 163, 184, 0.15); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                ⚪
+              </div>
+              <div>
+                <div id="connection-status-title" style="font-size: 0.9rem; font-weight: 700; color: #fff;">Chưa kết nối Fanpage</div>
+                <div id="connection-status-desc" style="font-size: 0.75rem; color: var(--text-muted);">Vui lòng nhập Page ID và Page Access Token để kích hoạt đăng thật</div>
+              </div>
+            </div>
+            <span id="connection-status-pill" class="badge-tag" style="color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);">CHƯA CẤU HÌNH</span>
+          </div>
+
+          <div class="datetime-grid">
+            <div>
+              <label class="form-label">
+                <span>Facebook Graph API Version</span>
+              </label>
+              <input type="text" class="input-field" value="v19.0" id="api-version-input" placeholder="v19.0">
+            </div>
+            <div>
+              <label class="form-label">
+                <span>1. Target Page ID (Dãy số ID Trang)</span>
+              </label>
+              <input type="text" class="input-field" placeholder="Ví dụ: 109283746192841" id="page-id-input">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>2. Page Access Token (Mã truy cập trang)</span>
+              <span class="form-label-right" style="color:#60a5fa;">Quyền: pages_manage_posts, publish_video</span>
+            </label>
+            <div style="position: relative;">
+              <input type="password" class="input-field" placeholder="Dán mã Page Access Token (bắt đầu bằng EAAG...) vào đây" id="page-token-input" style="padding-right: 2.8rem;">
+              <button type="button" id="btn-toggle-token-visibility" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer;" title="Hiện / Ẩn token">
+                👁️
+              </button>
+            </div>
+          </div>
+
+          <!-- Action buttons for Config -->
+          <div style="display:flex; gap:0.6rem; margin-bottom: 1.25rem;">
+            <button type="button" class="btn-queue-action" id="btn-save-config" style="flex: 1; justify-content: center;">
+              💾 Lưu vào .env
+            </button>
+            <button type="button" class="btn-queue-action" id="btn-verify-token" style="flex: 1.2; justify-content: center; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
+              🔍 Kiểm tra kết nối Fanpage (Live Verify)
+            </button>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">
+              <span>Payload Workflow Schema (Tương thích WorkflowRunner.ts)</span>
+            </label>
+            <textarea id="workflow-json-preview" class="custom-textarea" style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; min-height:190px;" readonly></textarea>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:0.6rem;">
+            <button type="button" class="btn-primary-action" id="btn-run-live" style="background: linear-gradient(135deg, #2563eb, #1d4ed8); justify-content: center;">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+              <span>🚀 THỰC THI ĐĂNG THẬT LÊN FANPAGE (GRAPH API)</span>
+            </button>
+            <button type="button" class="btn-secondary-action" id="btn-run-simulation" style="justify-content: center; background: rgba(255,255,255,0.05); border: 1px dashed rgba(255,255,255,0.2); color: #cbd5e1; padding: 0.65rem; border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 0.5rem;">
+              <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+              <span>Chạy Thử Mô Phỏng (Simulation Test Mode)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Right: Live Terminal Log Console -->
+        <div>
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="term-dot red"></span>
+                <span class="term-dot yellow"></span>
+                <span class="term-dot green"></span>
+              </div>
+              <div class="terminal-title">Workflow Execution Stream • Active</div>
+              <button type="button" class="btn-queue-action" style="padding:0.2rem 0.5rem;font-size:0.7rem;" id="btn-clear-logs">Xóa log</button>
+            </div>
+            <div class="terminal-body" id="terminal-logs">
+              <div class="log-line">
+                <span class="log-time">[14:00:00]</span>
+                <span class="log-step">[ENGINE]</span>
+                <span class="log-info">WorkflowRunner v1.0.0 initialized.</span>
+              </div>
+              <div class="log-line">
+                <span class="log-time">[14:00:01]</span>
+                <span class="log-step">[STEP_REG]</span>
+                <span class="log-success">StepRegistry loaded 6 steps: validate_video, chunk_upload, schedule_graph_api, post_first_comment, auto_pin, notify_tele.</span>
+              </div>
+              <div class="log-line">
+                <span class="log-time">[14:00:02]</span>
+                <span class="log-step">[DAEMON]</span>
+                <span class="log-info">Cron watcher is active on timezone Asia/Ho_Chi_Minh. 3 jobs in queue.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+
+    <!-- ============================================== -->
+    <!-- VIEW 5: THỎ BẢY MÀU REELS AUTO CRAWLER & REPOST -->
+    <!-- ============================================== -->
+    <section id="reels-view" class="view-section active">
+      <!-- Top Target URL & Scanning Control Bar -->
+      <div class="glass-card" style="margin-bottom: 1.5rem; border: 1px solid rgba(245, 158, 11, 0.3); background: rgba(26, 35, 58, 0.85); box-shadow: 0 8px 32px rgba(245, 158, 11, 0.1);">
+        <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.85rem;">
+            <div style="width: 44px; height: 44px; border-radius: 12px; background: linear-gradient(135deg, #f59e0b, #ef4444); display: flex; align-items: center; justify-content: center; font-size: 1.4rem; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);">
+              🎬
+            </div>
+            <div>
+              <h2 style="font-size: 1.15rem; font-weight: 800; color: #fff; display: flex; align-items: center; gap: 0.5rem;">
+                Tự Động Quét & Đăng Reels Fanpage (Thỏ Bảy Màu)
+                <span class="badge-tag" style="background: rgba(245, 158, 11, 0.2); border-color: rgba(245, 158, 11, 0.5); color: #fde047;">AUTOMATION PIPELINE</span>
+              </h2>
+              <div style="font-size: 0.8rem; color: var(--text-muted);">
+                Quét toàn bộ Reels từ trang nguồn, phân tích và lọc ra video có lượt view cao nhất, tải về HD và tự động đăng lên Fanpage của bạn.
+              </div>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 0.6rem; align-items: center;">
+            <button type="button" class="btn-primary-action" id="btn-reels-auto-all" style="background: linear-gradient(135deg, #f59e0b 0%, #ef4444 100%); box-shadow: 0 4px 20px rgba(239, 68, 68, 0.4);">
+              <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              <span>⚡ 1-Click Tự Động (Quét -> Tải Top 1 -> Đăng Fanpage)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- URL Input & Scan Parameters -->
+        <div style="display: grid; grid-template-columns: 1fr auto auto; gap: 0.75rem; align-items: flex-end;">
+          <div>
+            <label class="form-label" style="font-size: 0.8rem;">
+              <span>1. Link trang Facebook Reels mục tiêu</span>
+              <span class="form-label-right" style="color:#60a5fa;">Hỗ trợ bất kỳ link Facebook Reels nào</span>
+            </label>
+            <input type="text" class="input-field" id="reels-target-url" value="https://www.facebook.com/ThoBayMau/reels/" placeholder="https://www.facebook.com/ThoBayMau/reels/" style="font-family: monospace; font-size: 0.85rem;">
+          </div>
+
+          <div style="width: 140px;">
+            <label class="form-label" style="font-size: 0.8rem;">
+              <span>Độ sâu quét</span>
+            </label>
+            <select class="select-field" id="reels-scroll-count" style="font-size: 0.85rem; padding: 0.65rem;">
+              <option value="2">Nhanh (2 lần cuộn)</option>
+              <option value="4" selected>Tiêu chuẩn (4 lần)</option>
+              <option value="8">Sâu hơn (8 lần)</option>
+            </select>
+          </div>
+
+          <div>
+            <button type="button" class="btn-queue-action" id="btn-scan-reels" style="padding: 0.72rem 1.25rem; font-weight: 700; background: rgba(59, 130, 246, 0.2); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
+              🔍 Quét & Tìm Video Top View
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Reels Workflow 2-Column Grid -->
+      <div class="queue-dashboard-grid">
+        
+        <!-- Left: TOP 1 VIDEO & PUBLISH SETTINGS -->
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+
+          <!-- FANPAGE CREDENTIALS & GRAPH API SETUP CARD -->
+          <div class="glass-card" style="border: 1px solid rgba(59, 130, 246, 0.35); background: rgba(17, 24, 39, 0.95); box-shadow: 0 4px 20px rgba(0,0,0,0.3);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.85rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="width: 34px; height: 34px; border-radius: 8px; background: rgba(59, 130, 246, 0.2); color: #60a5fa; display: flex; align-items: center; justify-content: center; font-size: 1.15rem;">
+                  🔑
+                </div>
+                <div>
+                  <h3 class="card-title" style="font-size: 0.95rem;">Cấu Hình Fanpage Đích (Auto Upload)</h3>
+                  <div style="font-size: 0.72rem; color: var(--text-muted);">Cài đặt Page ID & Page Access Token để đăng video thật</div>
+                </div>
+              </div>
+              <span id="reels-fb-status-pill" class="badge-tag" style="background: rgba(148, 163, 184, 0.15); color: #94a3b8; border-color: rgba(148, 163, 184, 0.3);">
+                CHƯA KẾT NỐI
+              </span>
+            </div>
+
+            <!-- Page ID & Token Inputs -->
+            <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1rem;">
+              <div>
+                <label class="form-label" style="font-size: 0.78rem;">
+                  <span>Page ID (Dãy số ID Fanpage của bạn)</span>
+                  <span class="form-label-right" style="color: #60a5fa;">VD: 109283746192841</span>
+                </label>
+                <input type="text" class="input-field" id="reels-cfg-page-id" placeholder="Nhập Page ID của Fanpage" style="font-size: 0.85rem;">
+              </div>
+
+              <div>
+                <label class="form-label" style="font-size: 0.78rem;">
+                  <span>Page Access Token (Mã quyền đăng bài)</span>
+                  <span class="form-label-right" style="color: #a78bfa;">Quyền: pages_manage_posts, publish_video</span>
+                </label>
+                <div style="position: relative;">
+                  <input type="password" class="input-field" id="reels-cfg-page-token" placeholder="Dán mã EAAG... vào đây" style="font-size: 0.85rem; padding-right: 2.8rem;">
+                  <button type="button" id="btn-toggle-reels-token" style="position: absolute; right: 0.75rem; top: 50%; transform: translateY(-50%); background: none; border: none; color: #94a3b8; cursor: pointer;" title="Hiện / Ẩn token">
+                    👁️
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action buttons for Config -->
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+              <button type="button" class="btn-queue-action" id="btn-save-reels-config" style="flex: 1; justify-content: center; font-size: 0.78rem; padding: 0.55rem 0.8rem;">
+                💾 Lưu vào .env
+              </button>
+              <button type="button" class="btn-queue-action" id="btn-verify-reels-config" style="flex: 1.2; justify-content: center; font-size: 0.78rem; padding: 0.55rem 0.8rem; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
+                🔍 Live Verify Fanpage
+              </button>
+              <button type="button" class="btn-queue-action" id="btn-run-simulation-mode" style="flex: 1.3; justify-content: center; font-size: 0.78rem; padding: 0.55rem 0.8rem; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                🧪 Test Chạy Thử Mô Phỏng
+              </button>
+            </div>
+          </div>
+
+          <!-- TOP 1 VIDEO HIGHLIGHT HERO CARD -->
+          <div class="glass-card" id="top-reel-highlight-box" style="border: 2px solid #f59e0b; background: linear-gradient(180deg, rgba(30, 41, 59, 0.95) 0%, rgba(15, 23, 42, 0.95) 100%); box-shadow: 0 0 35px rgba(245, 158, 11, 0.25);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <span style="font-size: 1.4rem;">👑</span>
+                <div>
+                  <h3 style="font-size: 1rem; font-weight: 800; color: #fde047; text-transform: uppercase; letter-spacing: 0.5px;">
+                    Video Có Lượt View Cao Nhất (Top #1)
+                  </h3>
+                  <div id="top-reel-views-raw" style="font-size: 0.78rem; color: #cbd5e1;">
+                    Tổng chính xác: 29,000,000 views (Xếp hạng #1 Toàn Trang)
+                  </div>
+                </div>
+              </div>
+              <span id="top-reel-views-badge" class="badge-tag" style="background: linear-gradient(135deg, #f59e0b, #ef4444); color: #fff; font-size: 0.85rem; font-weight: 800; padding: 0.3rem 0.75rem; border-radius: 8px;">
+                29M LƯỢT XEM
+              </span>
+            </div>
+
+            <!-- Video Player / Thumbnail Preview Area -->
+            <div style="position: relative; border-radius: 12px; overflow: hidden; background: #000; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 1rem; min-height: 240px; display: flex; align-items: center; justify-content: center;">
+              <!-- Video Player if downloaded -->
+              <div id="top-reel-video-wrapper" style="width: 100%; display: block;">
+                <video id="top-reel-video-player" src="/downloads/609854861764157.mp4" controls style="width: 100%; max-height: 380px; border-radius: 10px; display: block; background: #000;"></video>
+              </div>
+              <!-- Fallback Thumbnail -->
+              <img id="top-reel-thumb" src="assets/sample-reels.jpg" alt="Reel Cover" style="width: 100%; max-height: 380px; object-fit: cover; display: none;">
+            </div>
+
+            <!-- CUSTOMIZABLE REEL LINK INPUT GROUP -->
+            <div style="background: rgba(15, 23, 42, 0.75); border: 1px solid rgba(245, 158, 11, 0.35); border-radius: 10px; padding: 0.85rem; margin-bottom: 1rem;">
+              <label class="form-label" style="font-size: 0.78rem; margin-bottom: 0.4rem; display: flex; align-items: center; justify-content: space-between;">
+                <span style="display: flex; align-items: center; gap: 0.35rem; color: #fde047; font-weight: 700;">
+                  🔗 Đường dẫn Facebook Reel (Có thể dán / thay đổi link khác tùy ý):
+                </span>
+                <span id="top-reel-id" style="color: #94a3b8; font-family: monospace; font-size: 0.72rem;">ID: 609854861764157</span>
+              </label>
+
+              <div style="display: flex; gap: 0.5rem; align-items: center;">
+                <input type="text" class="input-field" id="custom-reel-url-input" 
+                  value="https://www.facebook.com/reel/609854861764157/" 
+                  placeholder="Dán link Facebook Reel bất kỳ vào đây..." 
+                  style="font-family: monospace; font-size: 0.82rem; flex: 1; border-color: rgba(245, 158, 11, 0.4);">
+                
+                <button type="button" class="btn-queue-action" id="btn-load-custom-reel" 
+                  style="white-space: nowrap; padding: 0.65rem 0.95rem; font-size: 0.78rem; font-weight: 700; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none; box-shadow: 0 2px 10px rgba(245, 158, 11, 0.3);">
+                  ⬇️ Tải & Nạp Video
+                </button>
+
+                <a id="top-reel-url" href="https://www.facebook.com/reel/609854861764157/" target="_blank" rel="noopener noreferrer" 
+                  class="btn-queue-action" style="padding: 0.65rem 0.8rem; text-decoration: none; font-size: 0.78rem; color: #93c5fd; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.35);" title="Mở trực tiếp trên Facebook">
+                  ↗ Mở FB
+                </a>
+              </div>
+
+              <!-- Quick suggestion chips -->
+              <div style="display: flex; align-items: center; gap: 0.4rem; margin-top: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Gợi ý link nhanh:</span>
+                <button type="button" class="btn-queue-action quick-reel-chip" data-url="https://www.facebook.com/reel/609854861764157/" data-id="609854861764157" data-views="29M" style="padding: 0.15rem 0.5rem; font-size: 0.7rem; border-radius: 6px; background: rgba(245, 158, 11, 0.15); color: #fde047; border-color: rgba(245, 158, 11, 0.3);">
+                  ⭐ Top 1 (29M)
+                </button>
+                <button type="button" class="btn-queue-action quick-reel-chip" data-url="https://www.facebook.com/reel/1285338499347283/" data-id="1285338499347283" data-views="18M" style="padding: 0.15rem 0.5rem; font-size: 0.7rem; border-radius: 6px; background: rgba(255,255,255,0.05); color: #cbd5e1;">
+                  🥈 Top 2 (18M)
+                </button>
+                <button type="button" class="btn-queue-action quick-reel-chip" data-url="https://www.facebook.com/reel/832718635489703/" data-id="832718635489703" data-views="12M" style="padding: 0.15rem 0.5rem; font-size: 0.7rem; border-radius: 6px; background: rgba(255,255,255,0.05); color: #cbd5e1;">
+                  🥉 Top 3 (12M)
+                </button>
+                <button type="button" class="btn-queue-action quick-reel-chip" data-url="https://www.facebook.com/reel/1016207723199940/" data-id="1016207723199940" data-views="8.2M" style="padding: 0.15rem 0.5rem; font-size: 0.7rem; border-radius: 6px; background: rgba(255,255,255,0.05); color: #cbd5e1;">
+                  #4 (8.2M)
+                </button>
+              </div>
+
+              <div id="custom-reel-status-msg" style="margin-top: 0.4rem; font-size: 0.72rem; color: #4ade80; display: flex; align-items: center; gap: 0.3rem;">
+                <span>✅ Đã tải và sẵn sàng video MP4 (17.45 MB)</span>
+              </div>
+            </div>
+
+            <!-- Primary Action Buttons for Top 1 Reel -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; margin-bottom: 0.6rem;">
+              <button type="button" class="btn-queue-action" id="btn-download-top-reel" style="justify-content: center; background: rgba(59, 130, 246, 0.15); border-color: rgba(59, 130, 246, 0.4); color: #93c5fd;">
+                ⬇️ Tải lại video MP4
+              </button>
+              <button type="button" class="btn-queue-action" id="btn-send-to-composer" style="justify-content: center; background: rgba(139, 92, 246, 0.15); border-color: rgba(139, 92, 246, 0.4); color: #c4b5fd;">
+                📝 Sửa ở Trình Soạn Thảo
+              </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 0.6rem;">
+              <button type="button" class="btn-primary-action" id="btn-publish-top-now" style="justify-content: center; background: linear-gradient(135deg, #2563eb, #1d4ed8);">
+                <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></svg>
+                <span>🚀 Đăng ngay lên Fanpage</span>
+              </button>
+              <button type="button" class="btn-queue-action" id="btn-publish-top-schedule" style="justify-content: center; background: rgba(16, 185, 129, 0.15); border-color: rgba(16, 185, 129, 0.4); color: #6ee7b7;">
+                ⏱️ Hẹn giờ đăng bài
+              </button>
+            </div>
+          </div>
+
+          <!-- SETTING & TEMPLATE FOR AUTO POST -->
+          <div class="glass-card">
+            <h3 class="card-title" style="margin-bottom: 1rem; font-size: 0.95rem; display: flex; align-items: center; gap: 0.5rem;">
+              ⚙️ Cấu Hình Nội Dung Đăng Lên Fanpage Của Bạn
+            </h3>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span>Mẫu Caption (Tự động chèn biến)</span>
+                <span class="form-label-right" style="color: #60a5fa;">{views}, {title}, {url}</span>
+              </label>
+              <textarea id="reels-caption-template" class="custom-textarea" style="min-height: 95px; font-size: 0.85rem;" placeholder="Nhập mẫu caption">[Thỏ Bảy Màu - Top View: 29M] Siêu phẩm hoạt hình Thỏ Bảy Màu đạt hơn 29 triệu lượt xem!
+
+Xem ngay thước phim đỉnh chóp này nhé cả nhà!
+#ThoBayMau #Reels #TopViews #HoatHinh #HaiHuoc #Viral</textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">
+                <span>Bình luận đầu tiên (First Comment tự động)</span>
+                <span class="form-label-right" style="color: #94a3b8;">Ghim link / Kêu gọi tương tác</span>
+              </label>
+              <input type="text" class="input-field" id="reels-first-comment" value="🐰 Cảm ơn các bạn đã ủng hộ Thỏ Bảy Màu! Đừng quên theo dõi fanpage để cập nhật những thước phim mới nhất nhé!" placeholder="Nội dung bình luận đầu tiên tự động">
+            </div>
+
+            <div style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 10px; padding: 0.85rem;">
+              <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.5rem;">
+                <label style="display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer;">
+                  <input type="checkbox" id="reels-schedule-checkbox" style="width: 16px; height: 16px; accent-color: #3b82f6;">
+                  <span>Lên lịch tự động (Schedule Post)</span>
+                </label>
+                <span style="font-size: 0.72rem; color: var(--text-muted);">Mặc định: Đăng ngay lập tức</span>
+              </div>
+              <input type="datetime-local" class="input-field" id="reels-schedule-time" style="font-size: 0.85rem;">
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Right: TERMINAL EXECUTION LOG & ALL DISCOVERED REELS LEADERBOARD -->
+        <div style="display: flex; flex-direction: column; gap: 1.25rem;">
+          
+          <!-- LIVE EXECUTION LOG TERMINAL -->
+          <div class="terminal-window">
+            <div class="terminal-header">
+              <div class="terminal-dots">
+                <span class="term-dot red"></span>
+                <span class="term-dot yellow"></span>
+                <span class="term-dot green"></span>
+              </div>
+              <div class="terminal-title">Reels Pipeline Terminal • Auto Orchestrator</div>
+              <button type="button" class="btn-queue-action" style="padding:0.2rem 0.5rem;font-size:0.7rem;" onclick="ReelsCrawler.clearLogs()">Xóa log</button>
+            </div>
+            <div class="terminal-body" id="reels-terminal-logs" style="max-height: 220px;">
+              <div class="log-line">
+                <span class="log-time">[HỆ THỐNG]</span>
+                <span class="log-step">[READY]</span>
+                <span class="log-info">Đã tải cấu hình Reels Scraper & Downloader (yt-dlp + Chrome headless).</span>
+              </div>
+              <div class="log-line">
+                <span class="log-time">[HỆ THỐNG]</span>
+                <span class="log-step">[CACHE]</span>
+                <span class="log-success">Video Top 1 (29M views) ID #609854861764157 đã có sẵn trong downloads/. Sẵn sàng phát và đăng!</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- ALL DISCOVERED REELS LEADERBOARD -->
+          <div class="glass-card" style="flex: 1;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: 0.75rem;">
+              <div style="display: flex; align-items: center; gap: 0.6rem;">
+                <h3 class="card-title" style="font-size: 0.95rem;">Bảng Xếp Hạng Reels Theo Lượt Xem</h3>
+                <span id="scanned-count-badge" class="badge-tag" style="background: rgba(59, 130, 246, 0.2); color: #93c5fd; border-color: rgba(59, 130, 246, 0.4);">
+                  11 video
+                </span>
+              </div>
+
+              <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.75rem; color: var(--text-muted);">Sắp xếp:</span>
+                <select id="reels-sort-select" class="select-field" style="padding: 0.3rem 0.6rem; font-size: 0.75rem; width: auto;">
+                  <option value="views-desc">Lượt xem giảm dần (Mặc định)</option>
+                  <option value="views-asc">Lượt xem tăng dần</option>
+                </select>
+                <button type="button" id="btn-batch-schedule-top" class="btn-queue-action" style="padding: 0.3rem 0.75rem; font-size: 0.75rem; background: rgba(139, 92, 246, 0.2); border-color: rgba(139, 92, 246, 0.45); color: #c4b5fd; font-weight: 600; display: flex; align-items: center; gap: 0.35rem;" onclick="ReelsCrawler.openBatchScheduleModal()" title="Tự động phân bổ lịch đăng cho các video Top View">
+                  ⚡ Lên Lịch Tự Động Top Reels
+                </button>
+              </div>
+            </div>
+
+            <!-- Loading Spinner during scan -->
+            <div id="reels-loading-spinner" style="display: none; align-items: center; justify-content: center; flex-direction: column; gap: 0.75rem; padding: 2rem;">
+              <div style="width: 32px; height: 32px; border: 3px solid rgba(255,255,255,0.2); border-top-color: #f59e0b; border-radius: 50%; animation: spin 0.8s linear infinite;"></div>
+              <div style="font-size: 0.85rem; color: #cbd5e1;">Đang khởi chạy trình duyệt quét Reels từ trang Thỏ Bảy Màu...</div>
+            </div>
+
+            <!-- Reels Grid -->
+            <div id="scanned-reels-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 0.85rem; max-height: 480px; overflow-y: auto; padding-right: 0.3rem;">
+              <!-- Populated dynamically by ReelsCrawler -->
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: HẸN GIỜ ĐĂNG VIDEO REEL ĐƯỢC CHỌN LÊN FANPAGE -->
+  <!-- ======================================================== -->
+  <div class="modal-overlay" id="modal-schedule-reel">
+    <div class="modal-sched-box">
+      <!-- Modal Header -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(15, 23, 42, 0.6);">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+            ⏱️
+          </div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 700; color: #f8fafc;">Thiết Lập Hẹn Giờ Đăng Reel</h3>
+            <div style="font-size: 0.75rem; color: #94a3b8;">Meta Graph API Scheduled Publish • Tự động xuất bản lên Fanpage</div>
+          </div>
+        </div>
+        <button type="button" onclick="ReelsCrawler.closeScheduleModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 6px;" title="Đóng">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body (Scrollable) -->
+      <div style="padding: 1.25rem 1.4rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+        
+        <!-- Video Preview Strip -->
+        <div style="display: flex; gap: 0.85rem; padding: 0.75rem; background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; align-items: center;">
+          <img id="sched-modal-thumb" src="" alt="Thumbnail" style="width: 65px; height: 65px; object-fit: cover; border-radius: 8px; background: #000; flex-shrink: 0;">
+          <div style="display: flex; flex-direction: column; gap: 0.25rem; flex: 1; min-width: 0;">
+            <div id="sched-modal-title" style="font-size: 0.85rem; font-weight: 700; color: #f1f5f9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+              Tiêu đề Reel
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+              <span id="sched-modal-views" class="badge-tag" style="background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.4); font-size: 0.72rem; padding: 0.15rem 0.45rem;">
+                🔥 29M views
+              </span>
+              <span id="sched-modal-id" style="font-size: 0.72rem; color: #94a3b8;">ID: 609854861764157</span>
+            </div>
+            <div style="font-size: 0.7rem; color: #34d399; display: flex; align-items: center; gap: 0.3rem;">
+              <span>🟢 Fanpage đích: <strong id="sched-modal-page-name">Scentoy</strong> (ID: <span id="sched-modal-page-id">1414360708428758</span>)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Date & Time Picker Section -->
+        <div>
+          <label class="form-label" style="font-size: 0.82rem; margin-bottom: 0.4rem; display: flex; justify-content: space-between;">
+            <span>📅 Chọn Ngày & Giờ Xuất Bản (Múi giờ GMT+7)</span>
+            <span style="color: #60a5fa; font-size: 0.72rem;">Tối thiểu 10 phút sau hiện tại</span>
+          </label>
+          <input type="datetime-local" id="sched-modal-datetime" class="input-field" style="font-size: 0.9rem; font-weight: 600; padding: 0.65rem 0.85rem; border-color: rgba(16, 185, 129, 0.4);">
+        </div>
+
+        <!-- Quick 1-Click Golden Hours Presets -->
+        <div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.35rem;">
+            <span>⚡ Phím tắt chọn nhanh khung giờ vàng (1-Click Presets):</span>
+          </div>
+          <div style="display: flex; gap: 0.4rem; flex-wrap: wrap;">
+            <button type="button" class="sched-preset-chip" onclick="ReelsCrawler.applySchedulePreset('+15m')">
+              ⚡ +15 Phút nữa
+            </button>
+            <button type="button" class="sched-preset-chip" onclick="ReelsCrawler.applySchedulePreset('+1h')">
+              ⏰ +1 Tiếng nữa
+            </button>
+            <button type="button" class="sched-preset-chip" onclick="ReelsCrawler.applySchedulePreset('tonight')">
+              🌟 Tối nay (19:30)
+            </button>
+            <button type="button" class="sched-preset-chip" onclick="ReelsCrawler.applySchedulePreset('tomorrow-noon')">
+              ☀️ Trưa mai (11:45)
+            </button>
+            <button type="button" class="sched-preset-chip" onclick="ReelsCrawler.applySchedulePreset('tomorrow-night')">
+              🌙 Tối mai (20:00)
+            </button>
+            <button type="button" class="sched-preset-chip" onclick="ReelsCrawler.applySchedulePreset('day-after')">
+              📅 Ngày mốt (19:30)
+            </button>
+          </div>
+        </div>
+
+        <!-- Caption Customizer -->
+        <div>
+          <label class="form-label" style="font-size: 0.82rem; margin-bottom: 0.35rem;">
+            <span>Nội dung Caption bài đăng</span>
+          </label>
+          <textarea id="sched-modal-caption" class="custom-textarea" style="min-height: 80px; font-size: 0.82rem;" placeholder="Nhập caption cho video này..."></textarea>
+        </div>
+
+        <!-- First Comment Toggle -->
+        <div style="background: rgba(15, 23, 42, 0.5); border: 1px solid rgba(255, 255, 255, 0.06); border-radius: 8px; padding: 0.65rem 0.85rem;">
+          <label style="display: flex; align-items: center; gap: 0.45rem; font-size: 0.78rem; font-weight: 600; cursor: pointer; margin-bottom: 0.4rem;">
+            <input type="checkbox" id="sched-modal-first-comment-check" checked style="accent-color: #10b981;">
+            <span>💬 Tự động bình luận đầu tiên (First Comment)</span>
+          </label>
+          <input type="text" id="sched-modal-first-comment" class="input-field" style="font-size: 0.78rem; padding: 0.45rem 0.75rem;" value="🐰 Cảm ơn các bạn đã ủng hộ Thỏ Bảy Màu! Đừng quên theo dõi fanpage nhé!">
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display: flex; justify-content: flex-end; gap: 0.65rem; padding: 0.9rem 1.4rem; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(15, 23, 42, 0.7);">
+        <button type="button" class="btn-queue-action" onclick="ReelsCrawler.closeScheduleModal()" style="font-size: 0.8rem; padding: 0.55rem 1rem;">
+          Đóng
+        </button>
+        <button type="button" id="btn-confirm-schedule-reel" class="btn-queue-action" onclick="ReelsCrawler.confirmScheduleReel()" style="font-size: 0.82rem; padding: 0.55rem 1.25rem; background: linear-gradient(135deg, #059669 0%, #10b981 100%); border-color: #10b981; color: #fff; font-weight: 700; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+          ⏱️ Xác Nhận Hẹn Giờ Đăng Lên Fanpage
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- MODAL: LÊN LỊCH TỰ ĐỘNG HÀNG LOẠT TOP REELS -->
+  <!-- ======================================================== -->
+  <div class="modal-overlay" id="modal-batch-schedule">
+    <div class="modal-sched-box">
+      <!-- Modal Header -->
+      <div style="display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.4rem; border-bottom: 1px solid rgba(255, 255, 255, 0.08); background: rgba(15, 23, 42, 0.6);">
+        <div style="display: flex; align-items: center; gap: 0.65rem;">
+          <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(139, 92, 246, 0.2); border: 1px solid rgba(139, 92, 246, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+            ⚡
+          </div>
+          <div>
+            <h3 style="font-size: 1rem; font-weight: 700; color: #f8fafc;">Lên Lịch Tự Động Hàng Loạt (Auto-Schedule)</h3>
+            <div style="font-size: 0.75rem; color: #94a3b8;">Tự động phân bổ lịch đăng cho các Reels Triệu View theo Khung Giờ Vàng</div>
+          </div>
+        </div>
+        <button type="button" onclick="ReelsCrawler.closeBatchScheduleModal()" style="background: none; border: none; color: #94a3b8; font-size: 1.25rem; cursor: pointer; padding: 0.25rem 0.5rem; border-radius: 6px;" title="Đóng">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div style="padding: 1.25rem 1.4rem; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem;">
+        <div>
+          <label class="form-label" style="font-size: 0.82rem; margin-bottom: 0.4rem;">
+            <span>Chọn số lượng video hàng đầu để lên lịch:</span>
+          </label>
+          <select id="batch-sched-count" class="select-field" style="font-size: 0.85rem; padding: 0.6rem 0.85rem;">
+            <option value="3">🏆 Top 3 Video lượt xem cao nhất (Khuyến nghị)</option>
+            <option value="5">🔥 Top 5 Video lượt xem cao nhất</option>
+            <option value="10">🚀 Tất cả 10 Video trong danh sách</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="form-label" style="font-size: 0.82rem; margin-bottom: 0.4rem;">
+            <span>Chiến lược phân bổ thời gian:</span>
+          </label>
+          <select id="batch-sched-strategy" class="select-field" style="font-size: 0.85rem; padding: 0.6rem 0.85rem;">
+            <option value="daily-gold">🌟 Mỗi ngày 1 video vào Giờ Vàng 19:30 (Bắt đầu từ tối nay)</option>
+            <option value="interval-4h">⚡ Cách nhau 4 tiếng (08:00, 12:00, 16:00, 20:00)</option>
+            <option value="daily-noon-night">☀️ + 🌙 Mỗi ngày 2 video (11:45 trưa & 20:00 tối)</option>
+          </select>
+        </div>
+
+        <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.25); border-radius: 8px; padding: 0.75rem; font-size: 0.78rem; color: #93c5fd; line-height: 1.45;">
+          ℹ️ <strong>Cơ chế tự động:</strong> Hệ thống sẽ tuần tự tải file video HD chất lượng cao về máy, sau đó gọi Meta Graph API thiết lập lịch đăng tự động cho từng video theo mốc thời gian đã định. Bạn hoàn toàn không cần can thiệp thủ công.
+        </div>
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="display: flex; justify-content: flex-end; gap: 0.65rem; padding: 0.9rem 1.4rem; border-top: 1px solid rgba(255, 255, 255, 0.08); background: rgba(15, 23, 42, 0.7);">
+        <button type="button" class="btn-queue-action" onclick="ReelsCrawler.closeBatchScheduleModal()" style="font-size: 0.8rem; padding: 0.55rem 1rem;">
+          Đóng
+        </button>
+        <button type="button" id="btn-confirm-batch-schedule" class="btn-queue-action" onclick="ReelsCrawler.confirmBatchSchedule()" style="font-size: 0.82rem; padding: 0.55rem 1.25rem; background: linear-gradient(135deg, #7c3aed 0%, #8b5cf6 100%); border-color: #8b5cf6; color: #fff; font-weight: 700; box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);">
+          🚀 Bắt Đầu Lên Lịch Hàng Loạt
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notifications Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- JavaScript Modules -->
+  <script src="js/scheduler.js"></script>
+  <script src="js/preview.js"></script>
+  <script src="js/workflow-bridge.js"></script>
+  <script src="js/reels-crawler.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

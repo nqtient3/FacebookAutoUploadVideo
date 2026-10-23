@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  fb-autopost:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fb_auto_upload_studio
+    restart: always
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=production
+      - FB_PAGE_ID=${FB_PAGE_ID}
+      - FB_PAGE_ACCESS_TOKEN=${FB_PAGE_ACCESS_TOKEN}
+      - FB_GRAPH_API_VERSION=${FB_GRAPH_API_VERSION:-v19.0}
+    volumes:
+      - ./downloads:/app/downloads

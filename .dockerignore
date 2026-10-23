@@ -1,0 +1,7 @@
+node_modules
+workflow-engine/node_modules
+workflow-engine/downloads/*.mp4
+downloads/*.mp4
+.env
+workflow-engine/.env
+.git
