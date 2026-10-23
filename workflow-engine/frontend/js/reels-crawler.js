@@ -941,14 +941,20 @@ const ReelsCrawler = {
           title: `Reel Thỏ Bảy Màu - ${reel.formattedViews}`,
           firstComment,
           scheduledPublishTime,
-          mediaFilePath: this.state.downloadResult.filePath,
+          mediaFilePath: this.state.downloadResult ? (this.state.downloadResult.filePath || this.state.downloadResult.fileName) : `${reel.reelId}.mp4`,
+          fileName: `${reel.reelId}.mp4`,
           mediaType: 'video/mp4',
-          deleteAfterUpload: true
+          deleteAfterUpload: false
         })
       });
 
       const data = await res.json();
       if (!data.success) {
+        if (data.error && data.error.includes('Không tìm thấy file video')) {
+          this.addLog('INFO', 'File video chưa có trên máy chủ. Đang tự động tải về trước...', 'highlight');
+          await this.downloadVideo(reel);
+          return this.publishSelectedReel(isSchedule);
+        }
         throw new Error(data.error || 'Đăng video lên Facebook thất bại.');
       }
 

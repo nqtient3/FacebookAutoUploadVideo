@@ -10,6 +10,27 @@ if (!fs.existsSync(DOWNLOADS_DIR)) {
   fs.mkdirSync(DOWNLOADS_DIR, { recursive: true });
 }
 
+function resolveMediaFilePath(inputPath) {
+  if (!inputPath) return null;
+  if (path.isAbsolute(inputPath) && fs.existsSync(inputPath)) {
+    return inputPath;
+  }
+  const baseName = path.basename(inputPath);
+  const candidates = [
+    path.join(DOWNLOADS_DIR, baseName),
+    path.join(__dirname, inputPath),
+    path.join(process.cwd(), inputPath),
+    path.join(process.cwd(), 'downloads', baseName),
+    path.join(process.cwd(), 'workflow-engine', 'downloads', baseName)
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c) && fs.statSync(c).isFile()) {
+      return c;
+    }
+  }
+  return null;
+}
+
 // Đọc cấu hình từ .env và biến môi trường hệ thống
 function loadEnvConfig() {
   const defaults = {
@@ -272,6 +293,17 @@ const server = http.createServer(async (req, res) => {
       }
 
       const deleteAfterUpload = body.deleteAfterUpload !== undefined ? !!body.deleteAfterUpload : true;
+      const rawMediaFilePath = body.mediaFilePath || (body.fileName ? path.join(DOWNLOADS_DIR, path.basename(body.fileName)) : null);
+      const mediaFilePath = resolveMediaFilePath(rawMediaFilePath);
+
+      // Kiểm tra file video tồn tại nếu format là reels hoặc feed-video
+      if ((body.format === 'reels' || body.format === 'feed-video') && !body.mediaBase64 && !mediaFilePath) {
+        console.warn(`[API /publish] ⚠️ Không tìm thấy file video tại '${rawMediaFilePath}'.`);
+        return sendJsonResponse(res, 400, {
+          success: false,
+          error: `Không tìm thấy file video (${path.basename(rawMediaFilePath || 'Chưa tải')}) trên máy chủ. Vui lòng bấm 'Tải Video' trước khi đăng!`
+        });
+      }
 
       const result = await facebookService.publishToFacebookPage({
         pageId,
@@ -283,17 +315,17 @@ const server = http.createServer(async (req, res) => {
         firstComment: body.firstComment || '',
         scheduledPublishTime: body.scheduledPublishTime || null,
         mediaBase64: body.mediaBase64 || null,
-        mediaFilePath: body.mediaFilePath || null,
+        mediaFilePath: mediaFilePath || rawMediaFilePath,
         mediaType: body.mediaType || null,
         deleteAfterUpload: deleteAfterUpload
       });
 
       // Đảm bảo xoá file video sau khi upload thành công nếu yêu cầu
-      if (result.success && deleteAfterUpload && body.mediaFilePath && fs.existsSync(body.mediaFilePath)) {
+      if (result.success && deleteAfterUpload && mediaFilePath && fs.existsSync(mediaFilePath)) {
         try {
-          fs.unlinkSync(body.mediaFilePath);
+          fs.unlinkSync(mediaFilePath);
           result.fileDeleted = true;
-          console.log(`[API /publish] 🗑️ Đã xoá file video sau khi đăng: ${body.mediaFilePath}`);
+          console.log(`[API /publish] 🗑️ Đã xoá file video sau khi đăng: ${mediaFilePath}`);
         } catch (delErr) {
           console.warn(`[API /publish] ⚠️ Không thể xoá file: ${delErr.message}`);
         }

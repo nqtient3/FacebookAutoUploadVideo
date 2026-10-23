@@ -460,10 +460,34 @@ async function publishToFacebookPage({
     };
   }
 
+/**
+ * Tự động tìm đường dẫn file video chính xác (hỗ trợ cả relative và absolute path)
+ */
+function resolveMediaFilePath(filePath) {
+  if (!filePath) return null;
+  if (path.isAbsolute(filePath) && fs.existsSync(filePath)) {
+    return filePath;
+  }
+  const baseName = path.basename(filePath);
+  const candidates = [
+    path.join(__dirname, '..', 'downloads', baseName),
+    path.join(__dirname, 'downloads', baseName),
+    path.join(process.cwd(), filePath),
+    path.join(process.cwd(), 'downloads', baseName),
+    path.join(process.cwd(), 'workflow-engine', 'downloads', baseName)
+  ];
+  for (const c of candidates) {
+    if (fs.existsSync(c) && fs.statSync(c).isFile()) {
+      return c;
+    }
+  }
+  return null;
+}
+
   // 3. Trường hợp: Video Feed hoặc Reels
   if (format === 'feed-video' || format === 'reels') {
     let targetPageId = cleanPageId || 'me';
-    let url = `https://graph.facebook.com/${version}/${targetPageId}/videos`;
+    let url = `https://graph-video.facebook.com/${version}/${targetPageId}/videos`;
     const formData = new FormData();
     formData.append('description', caption);
     if (title) formData.append('title', title);
@@ -476,15 +500,24 @@ async function publishToFacebookPage({
       formData.append('published', 'true');
     }
 
-    if (mediaFilePath && fs.existsSync(mediaFilePath)) {
-      const fileBuffer = fs.readFileSync(mediaFilePath);
+    const resolvedFilePath = resolveMediaFilePath(mediaFilePath);
+
+    if (resolvedFilePath && fs.existsSync(resolvedFilePath)) {
+      console.log(`[Facebook API] 📦 Đang nạp video: ${resolvedFilePath} (${(fs.statSync(resolvedFilePath).size / (1024*1024)).toFixed(2)} MB)`);
+      const fileBuffer = fs.readFileSync(resolvedFilePath);
       const blob = new Blob([fileBuffer], { type: mediaType || 'video/mp4' });
-      formData.append('source', blob, path.basename(mediaFilePath));
+      formData.append('source', blob, path.basename(resolvedFilePath));
     } else if (mediaBase64) {
       const base64Data = mediaBase64.replace(/^data:video\/\w+;base64,/, '');
       const buffer = Buffer.from(base64Data, 'base64');
       const blob = new Blob([buffer], { type: mediaType || 'video/mp4' });
       formData.append('source', blob, 'upload_video.mp4');
+    } else {
+      console.error(`[Facebook API] ❌ Không tìm thấy file video tại: ${mediaFilePath}`);
+      return {
+        success: false,
+        error: `Không tìm thấy file video (${path.basename(mediaFilePath || 'Chưa tải')}) trên máy chủ. Vui lòng bấm 'Tải Video' trước khi đăng!`
+      };
     }
 
     let res = await fetch(url, { method: 'POST', body: formData });
@@ -498,7 +531,7 @@ async function publishToFacebookPage({
         const fallbackId = (meData && meData.id) ? meData.id : 'me';
         if (fallbackId !== targetPageId) {
           console.log(`[Auto-Resolve] Đang chuyển targetPageId từ ${targetPageId} sang ID chuẩn: ${fallbackId}`);
-          url = `https://graph.facebook.com/${version}/${fallbackId}/videos`;
+          url = `https://graph-video.facebook.com/${version}/${fallbackId}/videos`;
           res = await fetch(url, { method: 'POST', body: formData });
           data = await res.json();
         }
@@ -520,8 +553,8 @@ async function publishToFacebookPage({
 
     // Xử lý xoá video sau khi upload thành công (không lưu trữ trên máy chủ)
     let fileDeleted = false;
-    if (deleteAfterUpload && mediaFilePath) {
-      fileDeleted = await deleteLocalFile(mediaFilePath);
+    if (deleteAfterUpload && resolvedFilePath) {
+      fileDeleted = await deleteLocalFile(resolvedFilePath);
     }
 
     return {
