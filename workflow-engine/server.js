@@ -212,6 +212,48 @@ const server = http.createServer(async (req, res) => {
   }
 
   // ==========================================
+  // API ROUTE 3B: POST /api/facebook/pages (Lấy danh sách tất cả Fanpage & Page Tokens từ User/Page Token)
+  // ==========================================
+  if (req.method === 'POST' && reqPath === '/api/facebook/pages') {
+    try {
+      currentConfig = loadEnvConfig();
+      const body = await parseJsonBody(req);
+      const token = body.token || body.pageToken || currentConfig.FB_PAGE_ACCESS_TOKEN;
+      const apiVersion = body.apiVersion || currentConfig.FB_GRAPH_API_VERSION || 'v19.0';
+
+      if (!token) {
+        return sendJsonResponse(res, 400, {
+          success: false,
+          error: 'Vui lòng cung cấp mã Token (User Token hoặc Page Token).'
+        });
+      }
+
+      const result = await facebookService.fetchUserPages({ token, apiVersion });
+      return sendJsonResponse(res, result.success ? 200 : 400, result);
+    } catch (err) {
+      return sendJsonResponse(res, 500, { success: false, error: err.message });
+    }
+  }
+
+  // ==========================================
+  // API ROUTE 3C: POST /api/facebook/resolve-page (Tra cứu Page ID từ URL hoặc Username)
+  // ==========================================
+  if (req.method === 'POST' && reqPath === '/api/facebook/resolve-page') {
+    try {
+      currentConfig = loadEnvConfig();
+      const body = await parseJsonBody(req);
+      const input = body.input || body.url || body.pageUrl || '';
+      const token = body.token || currentConfig.FB_PAGE_ACCESS_TOKEN || '';
+      const apiVersion = body.apiVersion || currentConfig.FB_GRAPH_API_VERSION || 'v19.0';
+
+      const result = await facebookService.resolvePageIdFromInput({ input, token, apiVersion });
+      return sendJsonResponse(res, result.success ? 200 : 400, result);
+    } catch (err) {
+      return sendJsonResponse(res, 500, { success: false, error: err.message });
+    }
+  }
+
+  // ==========================================
   // API ROUTE 4: POST /api/publish (Đăng bài hoặc Hẹn giờ)
   // ==========================================
   if (req.method === 'POST' && reqPath === '/api/publish') {

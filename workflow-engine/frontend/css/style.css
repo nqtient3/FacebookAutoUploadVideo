@@ -1954,4 +1954,34 @@ input:checked + .slider:before {
   max-height: 90vh;
 }
 
+/* ======================================================== */
+/* TOKEN & PAGE ID ASSISTANT STYLES */
+/* ======================================================== */
+.assistant-tab-btn {
+  color: #94a3b8;
+  border-bottom: 2px solid transparent !important;
+  border-radius: 0 !important;
+  transition: all 0.2s ease;
+}
+
+.assistant-tab-btn:hover {
+  color: #f1f5f9;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.assistant-tab-btn.active {
+  color: #60a5fa !important;
+  border-bottom-color: #3b82f6 !important;
+  background: rgba(59, 130, 246, 0.1) !important;
+  font-weight: 700;
+}
+
+.assistant-page-card:hover {
+  border-color: rgba(59, 130, 246, 0.5) !important;
+  background: rgba(30, 41, 59, 0.95) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+}
+
+
 

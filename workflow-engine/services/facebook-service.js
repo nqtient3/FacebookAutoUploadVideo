@@ -114,6 +114,167 @@ async function verifyPageCredentials({ pageId, pageToken, apiVersion = FB_DEFAUL
 }
 
 /**
+ * Trích xuất danh sách tất cả các Fanpage mà Token này quản lý
+ * Tự động trả về Page ID và Page Access Token cho từng trang
+ */
+async function fetchUserPages({ token, apiVersion = FB_DEFAULT_API_VERSION }) {
+  if (!token) {
+    return { success: false, error: 'Vui lòng cung cấp mã Token (User Token hoặc Page Token).' };
+  }
+
+  const cleanToken = token.trim();
+  const version = (apiVersion || FB_DEFAULT_API_VERSION).trim();
+
+  const queryGraphApi = async (node, fields) => {
+    try {
+      const res = await fetch(`https://graph.facebook.com/${version}/${node}?fields=${fields}&access_token=${encodeURIComponent(cleanToken)}`);
+      return await res.json();
+    } catch (e) {
+      return { error: { message: e.message } };
+    }
+  };
+
+  // 1. Kiểm tra danh tính của Token
+  let me = await queryGraphApi('me', 'id,name,picture.type(large)');
+  if (me.error && me.error.code === 100) {
+    me = await queryGraphApi('me', 'id,name');
+  }
+
+  if (me.error && !me.id) {
+    return {
+      success: false,
+      error: me.error.message || 'Mã Token không hợp lệ hoặc đã hết hạn.',
+      code: me.error.code
+    };
+  }
+
+  // 2. Lấy danh sách các trang Fanpage quản lý qua /me/accounts
+  const accountsRes = await queryGraphApi('me/accounts', 'id,name,category,access_token,picture.type(large),link,tasks,followers_count');
+
+  const pages = [];
+
+  if (accountsRes && Array.isArray(accountsRes.data) && accountsRes.data.length > 0) {
+    for (const item of accountsRes.data) {
+      pages.push({
+        id: item.id,
+        name: item.name,
+        category: item.category || 'Fanpage',
+        followersCount: item.followers_count || 0,
+        pictureUrl: item.picture?.data?.url || null,
+        link: item.link || `https://facebook.com/${item.id}`,
+        pageToken: item.access_token, // Mã Page Access Token chuẩn của trang này
+        tasks: item.tasks || []
+      });
+    }
+
+    return {
+      success: true,
+      tokenType: 'USER_TOKEN',
+      account: {
+        id: me.id,
+        name: me.name,
+        pictureUrl: me.picture?.data?.url || null
+      },
+      totalPages: pages.length,
+      pages
+    };
+  }
+
+  // 3. Nếu /me/accounts rỗng, kiểm tra xem Token có phải chính là Page Access Token của 1 Fanpage không
+  const pageCheck = await queryGraphApi(me.id, 'id,name,category,picture.type(large),link,followers_count');
+  if (pageCheck && pageCheck.id && (pageCheck.category || pageCheck.followers_count !== undefined)) {
+    pages.push({
+      id: pageCheck.id,
+      name: pageCheck.name,
+      category: pageCheck.category || 'Fanpage',
+      followersCount: pageCheck.followers_count || 0,
+      pictureUrl: pageCheck.picture?.data?.url || me.picture?.data?.url || null,
+      link: pageCheck.link || `https://facebook.com/${pageCheck.id}`,
+      pageToken: cleanToken,
+      tasks: ['ADMIN']
+    });
+
+    return {
+      success: true,
+      tokenType: 'PAGE_TOKEN',
+      account: {
+        id: pageCheck.id,
+        name: pageCheck.name,
+        pictureUrl: pageCheck.picture?.data?.url || null
+      },
+      totalPages: 1,
+      pages
+    };
+  }
+
+  return {
+    success: false,
+    error: 'Tài khoản này chưa tạo Fanpage nào hoặc Token thiếu quyền "pages_show_list" / "pages_read_engagement". Vui lòng chọn thêm các quyền này trong Graph API Explorer.',
+    tokenType: 'USER_TOKEN_NO_PAGES',
+    account: {
+      id: me.id,
+      name: me.name
+    }
+  };
+}
+
+/**
+ * Tra cứu Page ID từ đường dẫn URL hoặc Username của Fanpage
+ */
+async function resolvePageIdFromInput({ input, token, apiVersion = FB_DEFAULT_API_VERSION }) {
+  if (!input) return { success: false, error: 'Vui lòng nhập link Fanpage hoặc ID/Username.' };
+
+  const raw = String(input).trim();
+
+  // Pattern 1: URL chứa profile.php?id=123456789
+  const profileIdMatch = raw.match(/profile\.php\?id=(\d+)/i);
+  if (profileIdMatch) {
+    return { success: true, pageId: profileIdMatch[1], method: 'URL_REGEX' };
+  }
+
+  // Pattern 2: URL chứa số ID trực tiếp dạng facebook.com/123456789
+  const directNumberMatch = raw.match(/facebook\.com\/(\d{10,})/i);
+  if (directNumberMatch) {
+    return { success: true, pageId: directNumberMatch[1], method: 'URL_REGEX' };
+  }
+
+  // Pattern 3: Dãy số ID thuần
+  if (/^\d{10,25}$/.test(raw)) {
+    return { success: true, pageId: raw, method: 'DIRECT_ID' };
+  }
+
+  // Pattern 4: Username hoặc URL trang -> Nếu có token, truy vấn Graph API /{username}
+  let username = raw;
+  if (raw.includes('facebook.com/')) {
+    const parts = raw.split('facebook.com/')[1].split('/')[0].split('?')[0];
+    if (parts) username = parts;
+  }
+
+  if (token && username) {
+    try {
+      const version = (apiVersion || FB_DEFAULT_API_VERSION).trim();
+      const res = await fetch(`https://graph.facebook.com/${version}/${encodeURIComponent(username)}?fields=id,name,picture.type(large),link&access_token=${encodeURIComponent(token.trim())}`);
+      const data = await res.json();
+      if (data && data.id) {
+        return {
+          success: true,
+          pageId: data.id,
+          pageName: data.name,
+          pictureUrl: data.picture?.data?.url || null,
+          method: 'GRAPH_API'
+        };
+      }
+    } catch (e) {}
+  }
+
+  return {
+    success: false,
+    error: `Không thể tự động trích xuất Page ID từ: "${raw}". Vui lòng sử dụng tính năng "Trợ Lý Token" hoặc nhập trực tiếp dãy số ID.`
+  };
+}
+
+
+/**
  * Đăng bình luận đầu tiên (First Comment)
  */
 async function postFirstComment({ postId, comment, pageToken, apiVersion = FB_DEFAULT_API_VERSION }) {
@@ -378,8 +539,11 @@ async function publishToFacebookPage({
 
 module.exports = {
   verifyPageCredentials,
+  fetchUserPages,
+  resolvePageIdFromInput,
   publishToFacebookPage,
   postFirstComment,
   deleteLocalFile,
   FB_DEFAULT_API_VERSION
 };
+
